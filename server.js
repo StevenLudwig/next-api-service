@@ -22,6 +22,7 @@ server.use(cors({
 	methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD'
 }));
 server.use((req, res, next) => {
+	res.charSet('utf-8');
 	if (req.method == 'POST' && req.body) {
 		req.body = JSON.parse(req.body);
 	};
