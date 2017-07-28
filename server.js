@@ -1,6 +1,6 @@
 const restify = require('restify');
-const bodyParser = require('body-parser')
 const cors = require('cors');
+const morgan  = require('morgan');
 const mongoose = require('mongoose');
 const settings = require('./settings');
 const ModelComputer = require('./models/computer');
@@ -9,12 +9,24 @@ const server = restify.createServer({
 	version: '1.0.0'
 });
 
+server.pre(restify.pre.userAgentConnection());
+
 server.use(restify.plugins.acceptParser(server.acceptable));
-server.use(restify.plugins.bodyParser({ mapParams: true }));
-server.use(restify.plugins.urlEncodedBodyParser({ mapParams: true }));
-server.use(cors());
-/* server.use(bodyParser.json());
-server.use(bodyParser.urlencoded({ extended: true })); */
+server.use(restify.plugins.fullResponse());
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.bodyParser());
+server.use(morgan('combined'));
+server.use(cors({
+	allowedHeaders: 'Origin, Accept, Content-Type',
+	origin: '*',
+	methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD'
+}));
+server.use((req, res, next) => {
+	if (req.method == 'POST' && req.body) {
+		req.body = JSON.parse(req.body);
+	};
+	return next();
+});
 
 const api_version = "v2";
 
@@ -33,12 +45,11 @@ server.get(api_version.concat('/computers'), (req, res) => {
 server.post(api_version.concat('/computers'), (req, res) => {
 	const data = req.body;
 	if (!data) return res.send(400, { error: "no data" });
-	console.log("ths data",data);
 
 	const AddComputer = new ModelComputer(data);
-	AddComputer.save((error, computer) => {
-		if (error) return res.status(500, error);
-		return res.send(201, computer);
+	AddComputer.save((error, saved) => {
+		if (error) return res.send(500);
+		return res.send(201, saved);
 	});
 });
 
@@ -51,7 +62,9 @@ server.listen(5005, () => {
 		process.exit(1);
 	});
 
+	mongoose.Promise = Promise;
 	global.db = mongoose.connect(settings.MONGO.URI, {
-		useMongoClient: true
+		useMongoClient: true,
+		promiseLibrary: require('bluebird')
 	});
 });

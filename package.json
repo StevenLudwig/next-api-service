@@ -9,11 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "mongoose": "^4.11.4",
-    "mongoose-api-query": "^0.1.1-pre",
-    "mongoose-createdmodified": "0.0.2",
+    "morgan": "^1.8.2",
     "restify": "^5.0.1"
   }
 }
