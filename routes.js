@@ -8,8 +8,17 @@ router.get('/', (req, res) => {
 
 router.get('/computers', (req, res) => {
 	ModelComputer.find({}, (error, computers) => {
-		if (error) return res.send(500, error);
+		if (error) return res.status(500).send(error);
 		return res.status(200).send(computers);
+	});
+});
+
+router.get('/computers/:computer_id', (req, res) => {
+	const { computer_id } = req.params;
+
+	ModelComputer.findOne({ _id: computer_id }, (error, computer) => {
+		if (error) return res.status(500).send(error);
+		return res.status(200).send(computer);
 	});
 });
 
