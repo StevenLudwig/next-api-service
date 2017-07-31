@@ -7,8 +7,10 @@ const ComputerSchema = new mongoose.Schema({
 	serie: { type: String, trim: true },
 	price: Number,
 	comments: [{
-		comment: String,
-		date: Date
+		username: String,
+		email: String,
+		review: String,
+		date: { type: Date, default: moment().toDate() }
 	}],
 	votes: Number,
 	created_at: { type: Date, default: moment().toDate() }
